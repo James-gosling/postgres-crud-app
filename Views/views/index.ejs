@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User CRUD Application</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px 0;
+        }
+
+        .container-main {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            padding: 30px;
+            margin-top: 30px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 20px;
+        }
+
+        .header h1 {
+            color: #333;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .form-section {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            border-left: 4px solid #667eea;
+        }
+
+        .form-section h3 {
+            color: #333;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+
+        .form-group label {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+        }
+
+        .form-control {
+            border: 2px solid #e0e0e0;
+            border-radius: 5px;
+            padding: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            padding: 10px 25px;
+            font-weight: 600;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+            color: white;
+        }
+
+        .btn-danger {
+            padding: 5px 10px;
+            font-size: 12px;
+            border-radius: 3px;
+        }
+
+        .btn-warning {
+            padding: 5px 10px;
+            font-size: 12px;
+            border-radius: 3px;
+        }
+
+        .users-section h3 {
+            color: #333;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+
+        .table {
+            border-collapse: collapse;
+            background: white;
+        }
+
+        .table thead {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .table thead th {
+            padding: 15px;
+            font-weight: 600;
+            border: none;
+        }
+
+        .table tbody tr {
+            border-bottom: 1px solid #e0e0e0;
+            transition: all 0.3s ease;
+        }
+
+        .table tbody tr:hover {
+            background-color: #f0f0f0;
+        }
+
+        .table tbody td {
+            padding: 15px;
+            vertical-align: middle;
+        }
+
+        .alert {
+            border-radius: 5px;
+            border: none;
+            margin-bottom: 20px;
+        }
+
+        .alert-danger {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+
+        .no-users {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+            font-size: 16px;
+        }
+
+        .no-users i {
+            font-size: 48px;
+            margin-bottom: 15px;
+            opacity: 0.5;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 5px;
+        }
+
+        .badge {
+            padding: 5px 10px;
+            border-radius: 5px;
+        }
+
+        .cancel-btn {
+            margin-left: 10px;
+            background: #6c757d;
+            color: white;
+            border: none;
+            padding: 10px 25px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .cancel-btn:hover {
+            background: #5a6268;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container container-main" style="max-width: 900px;">
+        <!-- Header -->
+        <div class="header">
+            <h1><i class="fas fa-users"></i> User Management CRUD</h1>
+            <p>Manage your users with Docker Compose + PostgreSQL + Node.js</p>
+        </div>
+
+        <!-- Error Messages -->
+        <% if (typeof error !=='undefined' && error) { %>
+            <div class="alert alert-danger" role="alert">
+                <i class="fas fa-exclamation-circle"></i>
+                <%= error %>
+            </div>
+            <% } %>
+
+                <!-- Form Section -->
+                <div class="form-section">
+                    <h3>
+                        <i class="fas fa-<%= editingUser ? 'edit' : 'plus' %>"></i>
+                        <%= editingUser ? 'Edit User' : 'Add New User' %>
+                    </h3>
+
+                    <form id="userForm" onsubmit="handleFormSubmit(event)">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="name" class="form-label">Full Name *</label>
+                                <input type="text" class="form-control" id="name" name="name"
+                                    placeholder="Enter full name" value="<%= editingUser ? editingUser.name : '' %>"
+                                    required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="email" class="form-label">Email *</label>
+                                <input type="email" class="form-control" id="email" name="email"
+                                    placeholder="Enter email" value="<%= editingUser ? editingUser.email : '' %>"
+                                    required>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="age" class="form-label">Age</label>
+                                <input type="number" class="form-control" id="age" name="age" placeholder="Enter age"
+                                    min="1" max="150" value="<%= editingUser ? editingUser.age : '' %>">
+                            </div>
+                        </div>
+
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-<%= editingUser ? 'check' : 'save' %>"></i>
+                                <%= editingUser ? 'Update User' : 'Create User' %>
+                            </button>
+
+                            <% if (editingUser) { %>
+                                <button type="button" class="cancel-btn" onclick="cancelEdit()">
+                                    <i class="fas fa-times"></i> Cancel
+                                </button>
+                                <% } %>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Users List Section -->
+                <div class="users-section">
+                    <h3><i class="fas fa-list"></i> All Users (<%= users.length %>)</h3>
+
+                    <% if (users.length> 0) { %>
+                        <div style="overflow-x: auto;">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th style="width: 5%">ID</th>
+                                        <th style="width: 25%">Name</th>
+                                        <th style="width: 30%">Email</th>
+                                        <th style="width: 10%">Age</th>
+                                        <th style="width: 20%">Created</th>
+                                        <th style="width: 10%">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <% users.forEach(user=> { %>
+                                        <tr>
+                                            <td><span class="badge bg-info">
+                                                    <%= user.id %>
+                                                </span></td>
+                                            <td><strong>
+                                                    <%= user.name %>
+                                                </strong></td>
+                                            <td>
+                                                <%= user.email %>
+                                            </td>
+                                            <td>
+                                                <%= user.age ? user.age : '-' %>
+                                            </td>
+                                            <td><small>
+                                                    <%= new Date(user.created_at).toLocaleDateString() %>
+                                                </small></td>
+                                            <td>
+                                                <div class="action-buttons">
+                                                    <button class="btn btn-warning btn-sm"
+                                                        onclick="editUser(<%= user.id %>)" title="Edit">
+                                                        <i class="fas fa-edit"></i>
+                                                    </button>
+                                                    <button class="btn btn-danger btn-sm"
+                                                        onclick="deleteUser(<%= user.id %>, '<%= user.name %>')"
+                                                        title="Delete">
+                                                        <i class="fas fa-trash"></i>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <% }); %>
+                                </tbody>
+                            </table>
+                        </div>
+                        <% } else { %>
+                            <div class="no-users">
+                                <i class="fas fa-inbox"></i>
+                                <p>No users found. Create your first user to get started!</p>
+                            </div>
+                            <% } %>
+                </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function handleFormSubmit(event) {
+            event.preventDefault();
+
+            const name = document.getElementById('name').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const age = document.getElementById('age').value;
+
+            if (!name || !email) {
+                alert('Please fill in all required fields');
+                return;
+            }
+
+            const editingUser = '<%= editingUser ? editingUser.id : '' %>';
+
+            if (editingUser) {
+                updateUser(editingUser, name, email, age);
+            } else {
+                createUser(name, email, age);
+            }
+        }
+
+        function createUser(name, email, age) {
+            fetch('/users', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: new URLSearchParams({
+                    name,
+                    email,
+                    age: age || '',
+                }),
+            })
+                .then(() => window.location.reload())
+                .catch((error) => console.error('Error creating user:', error));
+        }
+
+        function editUser(userId) {
+            window.location.href = `/users/${userId}`;
+        }
+
+        function updateUser(userId, name, email, age) {
+            fetch(`/users/${userId}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    name,
+                    email,
+                    age: age || null,
+                }),
+            })
+                .then((response) => response.json())
+                .then((data) => {
+                    if (data.success) {
+                        window.location.href = '/';
+                    } else {
+                        alert(data.error || 'Error updating user');
+                    }
+                })
+                .catch((error) => console.error('Error updating user:', error));
+        }
+
+        function deleteUser(userId, userName) {
+            if (!confirm(`Are you sure you want to delete ${userName}? This action cannot be undone.`)) {
+                return;
+            }
+
+            fetch(`/users/${userId}`, {
+                method: 'DELETE',
+            })
+                .then((response) => response.json())
+                .then((data) => {
+                    if (data.success) {
+                        window.location.reload();
+                    } else {
+                        alert(data.error || 'Error deleting user');
+                    }
+                })
+                .catch((error) => console.error('Error deleting user:', error));
+        }
+
+        function cancelEdit() {
+            window.location.href = '/';
+        }
+    </script>
+</body>
+
+</html>
