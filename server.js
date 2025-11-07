@@ -6,7 +6,7 @@ const path = require('path');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Database Connection Pool
+// Pool de Conexiones a la Base de Datos
 const pool = new Pool({
     user: process.env.DB_USER || 'postgres',
     password: process.env.DB_PASSWORD || 'postgres',
@@ -20,11 +20,11 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(express.static('public'));
 
-// Set EJS as view engine
+// Configurar EJS como motor de vistas
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
-// Initialize Database Table
+// Inicializar la Tabla de la Base de Datos
 async function initializeDatabase() {
     try {
         await pool.query(`
@@ -37,34 +37,34 @@ async function initializeDatabase() {
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       );
     `);
-        console.log('✓ Database table initialized successfully');
+        console.log('✓ Tabla de la base de datos inicializada correctamente');
     } catch (error) {
-        console.error('✗ Error initializing database:', error);
+        console.error('✗ Error al inicializar la base de datos:', error);
         process.exit(1);
     }
 }
 
-// Routes
+// Rutas
 
-// GET - Display all users
+// GET - Mostrar todos los usuarios
 app.get('/', async (req, res) => {
     try {
         const result = await pool.query('SELECT * FROM users ORDER BY created_at DESC');
         const users = result.rows;
         res.render('index', { users, editingUser: null });
     } catch (error) {
-        console.error('Error fetching users:', error);
-        res.status(500).render('index', { users: [], error: 'Error fetching users' });
+        console.error('Error al obtener usuarios:', error);
+        res.status(500).render('index', { users: [], error: 'Error al obtener usuarios' });
     }
 });
 
-// POST - Create a new user
+// POST - Crear un nuevo usuario
 app.post('/users', async (req, res) => {
     const { name, email, age } = req.body;
 
-    // Validation
+    // Validación
     if (!name || !email) {
-        return res.status(400).json({ error: 'Name and email are required' });
+        return res.status(400).json({ error: 'Nombre y correo electrónico son requeridos' });
     }
 
     try {
@@ -72,25 +72,25 @@ app.post('/users', async (req, res) => {
             'INSERT INTO users (name, email, age) VALUES ($1, $2, $3)',
             [name, email, age || null]
         );
-        console.log(`✓ User created: ${name}`);
+        console.log(`✓ Usuario creado: ${name}`);
         res.redirect('/');
     } catch (error) {
-        console.error('Error creating user:', error);
+        console.error('Error al crear usuario:', error);
         if (error.code === '23505') {
-            return res.status(400).render('index', { users: [], error: 'Email already exists' });
+            return res.status(400).render('index', { users: [], error: 'El correo electrónico ya existe' });
         }
-        res.status(500).render('index', { users: [], error: 'Error creating user' });
+        res.status(500).render('index', { users: [], error: 'Error al crear usuario' });
     }
 });
 
-// GET - Get single user for editing
+// GET - Obtener un solo usuario para editar
 app.get('/users/:id', async (req, res) => {
     const { id } = req.params;
 
     try {
         const userResult = await pool.query('SELECT * FROM users WHERE id = $1', [id]);
         if (userResult.rows.length === 0) {
-            return res.status(404).json({ error: 'User not found' });
+            return res.status(404).json({ error: 'Usuario no encontrado' });
         }
 
         const usersResult = await pool.query('SELECT * FROM users ORDER BY created_at DESC');
@@ -99,19 +99,19 @@ app.get('/users/:id', async (req, res) => {
             editingUser: userResult.rows[0],
         });
     } catch (error) {
-        console.error('Error fetching user:', error);
-        res.status(500).json({ error: 'Error fetching user' });
+        console.error('Error al obtener usuario:', error);
+        res.status(500).json({ error: 'Error al obtener usuario' });
     }
 });
 
-// PUT - Update a user
+// PUT - Actualizar un usuario
 app.put('/users/:id', async (req, res) => {
     const { id } = req.params;
     const { name, email, age } = req.body;
 
-    // Validation
+    // Validación
     if (!name || !email) {
-        return res.status(400).json({ error: 'Name and email are required' });
+        return res.status(400).json({ error: 'Nombre y correo electrónico son requeridos' });
     }
 
     try {
@@ -121,21 +121,21 @@ app.put('/users/:id', async (req, res) => {
         );
 
         if (result.rows.length === 0) {
-            return res.status(404).json({ error: 'User not found' });
+            return res.status(404).json({ error: 'Usuario no encontrado' });
         }
 
-        console.log(`✓ User updated: ${name}`);
+        console.log(`✓ Usuario actualizado: ${name}`);
         res.json({ success: true, user: result.rows[0] });
     } catch (error) {
-        console.error('Error updating user:', error);
+        console.error('Error al actualizar usuario:', error);
         if (error.code === '23505') {
-            return res.status(400).json({ error: 'Email already exists' });
+            return res.status(400).json({ error: 'El correo electrónico ya existe' });
         }
-        res.status(500).json({ error: 'Error updating user' });
+        res.status(500).json({ error: 'Error al actualizar usuario' });
     }
 });
 
-// DELETE - Delete a user
+// DELETE - Eliminar un usuario
 app.delete('/users/:id', async (req, res) => {
     const { id } = req.params;
 
@@ -143,47 +143,47 @@ app.delete('/users/:id', async (req, res) => {
         const result = await pool.query('DELETE FROM users WHERE id = $1 RETURNING *', [id]);
 
         if (result.rows.length === 0) {
-            return res.status(404).json({ error: 'User not found' });
+            return res.status(404).json({ error: 'Usuario no encontrado' });
         }
 
-        console.log(`✓ User deleted: ${result.rows[0].name}`);
-        res.json({ success: true, message: 'User deleted successfully' });
+        console.log(`✓ Usuario eliminado: ${result.rows[0].name}`);
+        res.json({ success: true, message: 'Usuario eliminado correctamente' });
     } catch (error) {
-        console.error('Error deleting user:', error);
-        res.status(500).json({ error: 'Error deleting user' });
+        console.error('Error al eliminar usuario:', error);
+        res.status(500).json({ error: 'Error al eliminar usuario' });
     }
 });
 
-// Health Check
+// Verificación de estado
 app.get('/health', (req, res) => {
     res.status(200).json({ status: 'OK' });
 });
 
-// Error handling middleware
+// Middleware de manejo de errores
 app.use((err, req, res, next) => {
-    console.error('Unhandled error:', err);
-    res.status(500).json({ error: 'Internal server error' });
+    console.error('Error no manejado:', err);
+    res.status(500).json({ error: 'Error interno del servidor' });
 });
 
-// Start Server
+// Iniciar Servidor
 async function startServer() {
     await initializeDatabase();
 
     app.listen(PORT, () => {
-        console.log(`🚀 Servidor ejecutandose on http://localhost:${PORT}`);
+        console.log(`🚀 Servidor ejecutándose en http://localhost:${PORT}`);
         console.log(`📊 Base de Datos: ${process.env.DB_NAME || 'crud_app'}`);
-        console.log(`🔌 Host Base de Datos: ${process.env.DB_HOST || 'localhost'}`);
+        console.log(`🔌 Host de la Base de Datos: ${process.env.DB_HOST || 'localhost'}`);
     });
 }
 
 startServer().catch((error) => {
-    console.error('Failed to start server:', error);
+    console.error('Fallo al iniciar el servidor:', error);
     process.exit(1);
 });
 
-// Graceful shutdown
+// Cierre gracefully
 process.on('SIGTERM', () => {
-    console.log('SIGTERM signal received: closing HTTP server');
+    console.log('Señal SIGTERM recibida: cerrando servidor HTTP');
     pool.end();
     process.exit(0);
 });
