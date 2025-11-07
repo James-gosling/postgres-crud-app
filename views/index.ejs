@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>CRUD Data Stream</title>
+    <title>CRUD Sis Operativos</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
@@ -322,8 +322,8 @@
 
     <div class="container">
         <div class="header">
-            <h1><i class="fas fa-terminal"></i> DATA STREAM TERMINAL</h1>
-            <p>> User Management System | Docker + PostgreSQL + Node.js</p>
+            <h1><i class="fas fa-terminal"></i> CRUD SIS OPERATIVOS</h1>
+            <p>> Sistema de Gestión de Usuarios | Docker + PostgreSQL + Node.js</p>
         </div>
 
         <!-- Error Messages -->
@@ -337,36 +337,36 @@
         <div class="form-section">
             <h2>
                 <i class="fas fa-<%= editingUser ? 'edit' : 'plus' %>"></i>
-                > <%= editingUser ? 'EDIT USER' : 'ADD NEW USER' %>
+                > <%= editingUser ? 'EDITAR USUARIO' : 'AGREGAR NUEVO USUARIO' %>
             </h2>
 
             <form id="userForm" onsubmit="handleFormSubmit(event)">
                 <div class="form-group">
-                    <label for="name">FULL NAME *</label>
-                    <input type="text" id="name" name="name" placeholder="Enter full name" 
+                    <label for="name">NOMBRE COMPLETO *</label>
+                    <input type="text" id="name" name="name" placeholder="Ingrese nombre completo" 
                         value="<%= editingUser ? editingUser.name : '' %>" required>
                 </div>
 
                 <div class="form-group">
-                    <label for="email">EMAIL *</label>
-                    <input type="email" id="email" name="email" placeholder="Enter email" 
+                    <label for="email">CORREO ELECTRÓNICO *</label>
+                    <input type="email" id="email" name="email" placeholder="Ingrese correo electrónico" 
                         value="<%= editingUser ? editingUser.email : '' %>" required>
                 </div>
 
                 <div class="form-group">
-                    <label for="age">AGE</label>
-                    <input type="number" id="age" name="age" placeholder="Enter age" 
+                    <label for="age">EDAD</label>
+                    <input type="number" id="age" name="age" placeholder="Ingrese edad" 
                         min="1" max="150" value="<%= editingUser ? editingUser.age : '' %>">
                 </div>
 
                 <div class="button-group">
                     <button type="submit">
                         <i class="fas fa-<%= editingUser ? 'check' : 'save' %>"></i>
-                        <%= editingUser ? 'UPDATE USER' : 'CREATE USER' %>
+                        <%= editingUser ? 'ACTUALIZAR USUARIO' : 'CREAR USUARIO' %>
                     </button>
                     <% if (editingUser) { %>
                         <button type="button" class="btn-cancel" onclick="cancelEdit()">
-                            <i class="fas fa-times"></i> CANCEL
+                            <i class="fas fa-times"></i> CANCELAR
                         </button>
                     <% } %>
                 </div>
@@ -376,18 +376,18 @@
         <hr>
 
         <!-- Users List Section -->
-        <h2><i class="fas fa-list"></i> > ALL USERS (<%= users.length %>)</h2>
+        <h2><i class="fas fa-list"></i> > TODOS LOS USUARIOS (<%= users.length %>)</h2>
 
         <% if (users.length > 0) { %>
             <table>
                 <thead>
                     <tr>
                         <th style="width: 5%">ID</th>
-                        <th style="width: 25%">NAME</th>
-                        <th style="width: 35%">EMAIL</th>
-                        <th style="width: 10%">AGE</th>
-                        <th style="width: 15%">CREATED</th>
-                        <th style="width: 10%">ACTIONS</th>
+                        <th style="width: 25%">NOMBRE</th>
+                        <th style="width: 35%">CORREO</th>
+                        <th style="width: 10%">EDAD</th>
+                        <th style="width: 15%">CREADO</th>
+                        <th style="width: 10%">ACCIONES</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -397,14 +397,14 @@
                             <td><strong><%= user.name %></strong></td>
                             <td><%= user.email %></td>
                             <td><%= user.age ? user.age : '-' %></td>
-                            <td><small><%= new Date(user.created_at).toLocaleDateString() %></small></td>
+                            <td><small><%= new Date(user.created_at).toLocaleDateString('es-ES') %></small></td>
                             <td>
                                 <div class="action-buttons">
-                                    <button class="btn-edit" onclick="editUser(<%= user.id %>)" title="Edit">
-                                        <i class="fas fa-edit"></i> EDIT
+                                    <button class="btn-edit" onclick="editUser(<%= user.id %>)" title="Editar">
+                                        <i class="fas fa-edit"></i> EDITAR
                                     </button>
-                                    <button class="btn-delete" onclick="deleteUser(<%= user.id %>, '<%= user.name %>')" title="Delete">
-                                        <i class="fas fa-trash"></i> DELETE
+                                    <button class="btn-delete" onclick="deleteUser(<%= user.id %>, '<%= user.name %>')" title="Eliminar">
+                                        <i class="fas fa-trash"></i> ELIMINAR
                                     </button>
                                 </div>
                             </td>
@@ -415,7 +415,7 @@
         <% } else { %>
             <div class="no-users">
                 <i class="fas fa-inbox"></i>
-                <p>> NO USERS FOUND. CREATE YOUR FIRST USER TO GET STARTED!</p>
+                <p>> NO HAY USUARIOS. ¡CREA TU PRIMER USUARIO PARA COMENZAR!</p>
             </div>
         <% } %>
     </div>
@@ -470,7 +470,7 @@
             const age = document.getElementById('age').value;
 
             if (!name || !email) {
-                alert('> ERROR: PLEASE FILL IN ALL REQUIRED FIELDS');
+                alert('> ERROR: POR FAVOR COMPLETA TODOS LOS CAMPOS REQUERIDOS');
                 return;
             }
 
@@ -496,7 +496,7 @@
                 }),
             })
                 .then(() => window.location.reload())
-                .catch((error) => console.error('> ERROR creating user:', error));
+                .catch((error) => console.error('> ERROR creando usuario:', error));
         }
 
         function editUser(userId) {
@@ -520,14 +520,14 @@
                     if (data.success) {
                         window.location.href = '/';
                     } else {
-                        alert('> ERROR: ' + (data.error || 'Error updating user'));
+                        alert('> ERROR: ' + (data.error || 'Error al actualizar usuario'));
                     }
                 })
-                .catch((error) => console.error('> ERROR updating user:', error));
+                .catch((error) => console.error('> ERROR actualizando usuario:', error));
         }
 
         function deleteUser(userId, userName) {
-            if (!confirm(`> CONFIRM: DELETE ${userName.toUpperCase()}? THIS ACTION CANNOT BE UNDONE.`)) {
+            if (!confirm(`> CONFIRMAR: ¿ELIMINAR ${userName.toUpperCase()}? ESTA ACCIÓN NO SE PUEDE DESHACER.`)) {
                 return;
             }
 
@@ -539,10 +539,10 @@
                     if (data.success) {
                         window.location.reload();
                     } else {
-                        alert('> ERROR: ' + (data.error || 'Error deleting user'));
+                        alert('> ERROR: ' + (data.error || 'Error al eliminar usuario'));
                     }
                 })
-                .catch((error) => console.error('> ERROR deleting user:', error));
+                .catch((error) => console.error('> ERROR eliminando usuario:', error));
         }
 
         function cancelEdit() {
