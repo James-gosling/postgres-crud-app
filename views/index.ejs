@@ -1,318 +1,467 @@
 <!DOCTYPE html>
-<html lang="en">
-
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>User CRUD Application</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <title>CRUD Data Stream</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        body {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            padding: 20px 0;
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
 
-        .container-main {
-            background: white;
-            border-radius: 10px;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+        body {
+            background: #000;
+            color: #00FF41;
+            font-family: 'Orbitron', sans-serif;
+            overflow-x: hidden;
+            position: relative;
+            z-index: 1;
+        }
+
+        #matrixCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        .container {
+            position: relative;
+            z-index: 2;
             padding: 30px;
-            margin-top: 30px;
+            max-width: 1000px;
+            margin: 30px auto;
+            background-color: rgba(0, 0, 0, 0.85);
+            border: 2px solid #00FF41;
+            box-shadow: 0 0 20px #00FF41, inset 0 0 20px rgba(0, 255, 65, 0.05);
         }
 
         .header {
             text-align: center;
             margin-bottom: 30px;
-            border-bottom: 3px solid #667eea;
             padding-bottom: 20px;
+            border-bottom: 2px solid #00FF41;
         }
 
-        .header h1 {
-            color: #333;
-            font-weight: bold;
-            margin-bottom: 5px;
+        h1 {
+            font-size: 2.5em;
+            color: #00FF41;
+            text-shadow: 0 0 10px #00FF41;
+            letter-spacing: 3px;
+            margin-bottom: 10px;
         }
 
         .header p {
-            color: #666;
-            font-size: 14px;
+            color: #00AA00;
+            font-size: 0.9em;
+            letter-spacing: 1px;
+        }
+
+        h2 {
+            color: #00FF41;
+            text-shadow: 0 0 10px #00FF41;
+            margin-top: 25px;
+            margin-bottom: 15px;
+            font-size: 1.5em;
+            letter-spacing: 2px;
         }
 
         .form-section {
-            background: #f8f9fa;
-            padding: 25px;
-            border-radius: 8px;
-            margin-bottom: 30px;
-            border-left: 4px solid #667eea;
+            background: rgba(0, 20, 0, 0.6);
+            padding: 20px;
+            border: 1px solid rgba(0, 255, 65, 0.3);
+            margin-bottom: 25px;
+            border-left: 4px solid #00FF41;
         }
 
-        .form-section h3 {
-            color: #333;
-            margin-bottom: 20px;
-            font-weight: bold;
+        .form-group {
+            margin-bottom: 15px;
         }
 
-        .form-group label {
+        label {
+            display: block;
+            color: #00FF41;
             font-weight: 600;
-            color: #333;
-            margin-bottom: 8px;
+            margin-bottom: 5px;
+            text-shadow: 0 0 5px #00FF41;
         }
 
-        .form-control {
-            border: 2px solid #e0e0e0;
-            border-radius: 5px;
-            padding: 10px;
+        input[type="text"],
+        input[type="email"],
+        input[type="number"] {
+            width: 100%;
+            padding: 12px;
+            background-color: rgba(0, 50, 0, 0.8);
+            color: #00FF41;
+            border: 1px solid #00FF41;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 14px;
             transition: all 0.3s ease;
         }
 
-        .form-control:focus {
-            border-color: #667eea;
-            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+        input[type="text"]::placeholder,
+        input[type="email"]::placeholder,
+        input[type="number"]::placeholder {
+            color: #006600;
         }
 
-        .btn-primary {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border: none;
-            padding: 10px 25px;
+        input[type="text"]:focus,
+        input[type="email"]:focus,
+        input[type="number"]:focus {
+            outline: none;
+            border-color: #00FF41;
+            box-shadow: 0 0 15px #00FF41, inset 0 0 10px rgba(0, 255, 65, 0.1);
+            background-color: rgba(0, 70, 0, 0.9);
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        button {
+            flex: 1;
+            padding: 12px 25px;
+            background: rgba(0, 255, 65, 0.2);
+            color: #00FF41;
+            border: 2px solid #00FF41;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 14px;
             font-weight: 600;
-            border-radius: 5px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            cursor: pointer;
             transition: all 0.3s ease;
         }
 
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
-            color: white;
+        button:hover {
+            background: #00FF41;
+            color: #000;
+            box-shadow: 0 0 20px #00FF41;
+            transform: scale(1.05);
         }
 
-        .btn-danger {
-            padding: 5px 10px;
+        button:active {
+            transform: scale(0.98);
+        }
+
+        .btn-delete {
+            background: rgba(255, 68, 68, 0.2);
+            border-color: #FF4444;
+            color: #FF4444;
+            padding: 8px 15px;
             font-size: 12px;
-            border-radius: 3px;
+            flex: auto;
+            width: auto;
         }
 
-        .btn-warning {
-            padding: 5px 10px;
+        .btn-delete:hover {
+            background: #FF4444;
+            color: #000;
+            box-shadow: 0 0 15px #FF4444;
+        }
+
+        .btn-edit {
+            background: rgba(255, 200, 0, 0.2);
+            border-color: #FFD700;
+            color: #FFD700;
+            padding: 8px 15px;
             font-size: 12px;
-            border-radius: 3px;
+            flex: auto;
+            width: auto;
         }
 
-        .users-section h3 {
-            color: #333;
-            margin-bottom: 20px;
-            font-weight: bold;
+        .btn-edit:hover {
+            background: #FFD700;
+            color: #000;
+            box-shadow: 0 0 15px #FFD700;
         }
 
-        .table {
+        .btn-cancel {
+            background: rgba(100, 100, 100, 0.2);
+            border-color: #999;
+            color: #999;
+            flex: 1;
+        }
+
+        .btn-cancel:hover {
+            background: #999;
+            color: #000;
+            box-shadow: 0 0 15px #999;
+        }
+
+        table {
+            width: 100%;
             border-collapse: collapse;
-            background: white;
+            background: rgba(0, 30, 0, 0.5);
+            margin-top: 20px;
         }
 
-        .table thead {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
+        thead {
+            background: rgba(0, 100, 0, 0.8);
         }
 
-        .table thead th {
+        th {
             padding: 15px;
+            text-align: left;
+            color: #00FF41;
+            border: 1px solid #00FF41;
+            text-shadow: 0 0 5px #00FF41;
             font-weight: 600;
-            border: none;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
 
-        .table tbody tr {
-            border-bottom: 1px solid #e0e0e0;
+        td {
+            padding: 15px;
+            border: 1px solid rgba(0, 255, 65, 0.2);
+            color: #00FF41;
+        }
+
+        tbody tr {
             transition: all 0.3s ease;
         }
 
-        .table tbody tr:hover {
-            background-color: #f0f0f0;
+        tbody tr:hover {
+            background-color: rgba(0, 100, 0, 0.3);
+            box-shadow: inset 0 0 10px rgba(0, 255, 65, 0.1);
         }
 
-        .table tbody td {
-            padding: 15px;
-            vertical-align: middle;
-        }
-
-        .alert {
-            border-radius: 5px;
-            border: none;
-            margin-bottom: 20px;
-        }
-
-        .alert-danger {
-            background-color: #f8d7da;
-            color: #721c24;
+        .action-buttons {
+            display: flex;
+            gap: 8px;
         }
 
         .no-users {
             text-align: center;
             padding: 40px;
-            color: #999;
-            font-size: 16px;
+            color: #00AA00;
+            font-size: 1.1em;
         }
 
         .no-users i {
             font-size: 48px;
+            color: #00FF41;
+            text-shadow: 0 0 10px #00FF41;
             margin-bottom: 15px;
-            opacity: 0.5;
-        }
-
-        .action-buttons {
-            display: flex;
-            gap: 5px;
+            display: block;
         }
 
         .badge {
+            display: inline-block;
             padding: 5px 10px;
-            border-radius: 5px;
+            background: rgba(0, 150, 0, 0.8);
+            border: 1px solid #00FF41;
+            color: #00FF41;
+            font-size: 0.9em;
+            border-radius: 3px;
         }
 
-        .cancel-btn {
-            margin-left: 10px;
-            background: #6c757d;
-            color: white;
+        hr {
             border: none;
-            padding: 10px 25px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-weight: 600;
-            transition: all 0.3s ease;
+            border-top: 1px solid rgba(0, 255, 65, 0.3);
+            margin: 20px 0;
         }
 
-        .cancel-btn:hover {
-            background: #5a6268;
+        .alert {
+            padding: 15px;
+            margin-bottom: 20px;
+            border: 2px solid #FF4444;
+            background: rgba(100, 0, 0, 0.4);
+            color: #FF8888;
+            border-radius: 3px;
+        }
+
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.5);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #00FF41;
+            border-radius: 5px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #00AA00;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 1.8em;
+            }
+
+            .container {
+                margin: 10px;
+                padding: 15px;
+            }
+
+            table {
+                font-size: 12px;
+            }
+
+            th, td {
+                padding: 10px;
+            }
         }
     </style>
 </head>
 
 <body>
-    <div class="container container-main" style="max-width: 900px;">
-        <!-- Header -->
+    <canvas id="matrixCanvas"></canvas>
+
+    <div class="container">
         <div class="header">
-            <h1><i class="fas fa-users"></i> User Management CRUD</h1>
-            <p>Manage your users with Docker Compose + PostgreSQL + Node.js</p>
+            <h1><i class="fas fa-terminal"></i> DATA STREAM TERMINAL</h1>
+            <p>> User Management System | Docker + PostgreSQL + Node.js</p>
         </div>
 
         <!-- Error Messages -->
         <% if (typeof error !=='undefined' && error) { %>
-            <div class="alert alert-danger" role="alert">
-                <i class="fas fa-exclamation-circle"></i>
-                <%= error %>
+            <div class="alert">
+                <i class="fas fa-exclamation-circle"></i> <%= error %>
             </div>
-            <% } %>
+        <% } %>
 
-                <!-- Form Section -->
-                <div class="form-section">
-                    <h3>
-                        <i class="fas fa-<%= editingUser ? 'edit' : 'plus' %>"></i>
-                        <%= editingUser ? 'Edit User' : 'Add New User' %>
-                    </h3>
+        <!-- Form Section -->
+        <div class="form-section">
+            <h2>
+                <i class="fas fa-<%= editingUser ? 'edit' : 'plus' %>"></i>
+                > <%= editingUser ? 'EDIT USER' : 'ADD NEW USER' %>
+            </h2>
 
-                    <form id="userForm" onsubmit="handleFormSubmit(event)">
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label for="name" class="form-label">Full Name *</label>
-                                <input type="text" class="form-control" id="name" name="name"
-                                    placeholder="Enter full name" value="<%= editingUser ? editingUser.name : '' %>"
-                                    required>
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label for="email" class="form-label">Email *</label>
-                                <input type="email" class="form-control" id="email" name="email"
-                                    placeholder="Enter email" value="<%= editingUser ? editingUser.email : '' %>"
-                                    required>
-                            </div>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label for="age" class="form-label">Age</label>
-                                <input type="number" class="form-control" id="age" name="age" placeholder="Enter age"
-                                    min="1" max="150" value="<%= editingUser ? editingUser.age : '' %>">
-                            </div>
-                        </div>
-
-                        <div class="d-flex gap-2">
-                            <button type="submit" class="btn btn-primary">
-                                <i class="fas fa-<%= editingUser ? 'check' : 'save' %>"></i>
-                                <%= editingUser ? 'Update User' : 'Create User' %>
-                            </button>
-
-                            <% if (editingUser) { %>
-                                <button type="button" class="cancel-btn" onclick="cancelEdit()">
-                                    <i class="fas fa-times"></i> Cancel
-                                </button>
-                                <% } %>
-                        </div>
-                    </form>
+            <form id="userForm" onsubmit="handleFormSubmit(event)">
+                <div class="form-group">
+                    <label for="name">FULL NAME *</label>
+                    <input type="text" id="name" name="name" placeholder="Enter full name" 
+                        value="<%= editingUser ? editingUser.name : '' %>" required>
                 </div>
 
-                <!-- Users List Section -->
-                <div class="users-section">
-                    <h3><i class="fas fa-list"></i> All Users (<%= users.length %>)</h3>
-
-                    <% if (users.length> 0) { %>
-                        <div style="overflow-x: auto;">
-                            <table class="table table-hover">
-                                <thead>
-                                    <tr>
-                                        <th style="width: 5%">ID</th>
-                                        <th style="width: 25%">Name</th>
-                                        <th style="width: 30%">Email</th>
-                                        <th style="width: 10%">Age</th>
-                                        <th style="width: 20%">Created</th>
-                                        <th style="width: 10%">Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <% users.forEach(user=> { %>
-                                        <tr>
-                                            <td><span class="badge bg-info">
-                                                    <%= user.id %>
-                                                </span></td>
-                                            <td><strong>
-                                                    <%= user.name %>
-                                                </strong></td>
-                                            <td>
-                                                <%= user.email %>
-                                            </td>
-                                            <td>
-                                                <%= user.age ? user.age : '-' %>
-                                            </td>
-                                            <td><small>
-                                                    <%= new Date(user.created_at).toLocaleDateString() %>
-                                                </small></td>
-                                            <td>
-                                                <div class="action-buttons">
-                                                    <button class="btn btn-warning btn-sm"
-                                                        onclick="editUser(<%= user.id %>)" title="Edit">
-                                                        <i class="fas fa-edit"></i>
-                                                    </button>
-                                                    <button class="btn btn-danger btn-sm"
-                                                        onclick="deleteUser(<%= user.id %>, '<%= user.name %>')"
-                                                        title="Delete">
-                                                        <i class="fas fa-trash"></i>
-                                                    </button>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                        <% }); %>
-                                </tbody>
-                            </table>
-                        </div>
-                        <% } else { %>
-                            <div class="no-users">
-                                <i class="fas fa-inbox"></i>
-                                <p>No users found. Create your first user to get started!</p>
-                            </div>
-                            <% } %>
+                <div class="form-group">
+                    <label for="email">EMAIL *</label>
+                    <input type="email" id="email" name="email" placeholder="Enter email" 
+                        value="<%= editingUser ? editingUser.email : '' %>" required>
                 </div>
+
+                <div class="form-group">
+                    <label for="age">AGE</label>
+                    <input type="number" id="age" name="age" placeholder="Enter age" 
+                        min="1" max="150" value="<%= editingUser ? editingUser.age : '' %>">
+                </div>
+
+                <div class="button-group">
+                    <button type="submit">
+                        <i class="fas fa-<%= editingUser ? 'check' : 'save' %>"></i>
+                        <%= editingUser ? 'UPDATE USER' : 'CREATE USER' %>
+                    </button>
+                    <% if (editingUser) { %>
+                        <button type="button" class="btn-cancel" onclick="cancelEdit()">
+                            <i class="fas fa-times"></i> CANCEL
+                        </button>
+                    <% } %>
+                </div>
+            </form>
+        </div>
+
+        <hr>
+
+        <!-- Users List Section -->
+        <h2><i class="fas fa-list"></i> > ALL USERS (<%= users.length %>)</h2>
+
+        <% if (users.length > 0) { %>
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width: 5%">ID</th>
+                        <th style="width: 25%">NAME</th>
+                        <th style="width: 35%">EMAIL</th>
+                        <th style="width: 10%">AGE</th>
+                        <th style="width: 15%">CREATED</th>
+                        <th style="width: 10%">ACTIONS</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% users.forEach(user => { %>
+                        <tr>
+                            <td><span class="badge"><%= user.id %></span></td>
+                            <td><strong><%= user.name %></strong></td>
+                            <td><%= user.email %></td>
+                            <td><%= user.age ? user.age : '-' %></td>
+                            <td><small><%= new Date(user.created_at).toLocaleDateString() %></small></td>
+                            <td>
+                                <div class="action-buttons">
+                                    <button class="btn-edit" onclick="editUser(<%= user.id %>)" title="Edit">
+                                        <i class="fas fa-edit"></i> EDIT
+                                    </button>
+                                    <button class="btn-delete" onclick="deleteUser(<%= user.id %>, '<%= user.name %>')" title="Delete">
+                                        <i class="fas fa-trash"></i> DELETE
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    <% }) %>
+                </tbody>
+            </table>
+        <% } else { %>
+            <div class="no-users">
+                <i class="fas fa-inbox"></i>
+                <p>> NO USERS FOUND. CREATE YOUR FIRST USER TO GET STARTED!</p>
+            </div>
+        <% } %>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
+        // Matrix Rain Animation
+        const canvas = document.getElementById('matrixCanvas');
+        const ctx = canvas.getContext('2d');
+
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        const characters = 'ｦｧｨｩｪｫｬｭｮｯｰｱｲｳｴｵｶｷｸｹｺﾀﾁﾂﾃﾄﾅﾆﾇﾈﾊﾋﾌﾍﾎﾏﾐﾑﾒﾓﾔﾕﾗﾘﾜ';
+        const fontSize = 16;
+        const columns = canvas.width / fontSize;
+        const drops = [];
+
+        for (let i = 0; i < columns; i++) {
+            drops[i] = 1;
+        }
+
+        function drawMatrix() {
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = '#00FF41';
+            ctx.font = fontSize + 'px "Orbitron"';
+
+            for (let i = 0; i < drops.length; i++) {
+                const text = characters.charAt(Math.floor(Math.random() * characters.length));
+                ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+
+                if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+                    drops[i] = 0;
+                }
+                drops[i]++;
+            }
+        }
+
+        setInterval(drawMatrix, 30);
+
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+
+        // CRUD Functions
         function handleFormSubmit(event) {
             event.preventDefault();
 
@@ -321,7 +470,7 @@
             const age = document.getElementById('age').value;
 
             if (!name || !email) {
-                alert('Please fill in all required fields');
+                alert('> ERROR: PLEASE FILL IN ALL REQUIRED FIELDS');
                 return;
             }
 
@@ -347,7 +496,7 @@
                 }),
             })
                 .then(() => window.location.reload())
-                .catch((error) => console.error('Error creating user:', error));
+                .catch((error) => console.error('> ERROR creating user:', error));
         }
 
         function editUser(userId) {
@@ -371,14 +520,14 @@
                     if (data.success) {
                         window.location.href = '/';
                     } else {
-                        alert(data.error || 'Error updating user');
+                        alert('> ERROR: ' + (data.error || 'Error updating user'));
                     }
                 })
-                .catch((error) => console.error('Error updating user:', error));
+                .catch((error) => console.error('> ERROR updating user:', error));
         }
 
         function deleteUser(userId, userName) {
-            if (!confirm(`Are you sure you want to delete ${userName}? This action cannot be undone.`)) {
+            if (!confirm(`> CONFIRM: DELETE ${userName.toUpperCase()}? THIS ACTION CANNOT BE UNDONE.`)) {
                 return;
             }
 
@@ -390,10 +539,10 @@
                     if (data.success) {
                         window.location.reload();
                     } else {
-                        alert(data.error || 'Error deleting user');
+                        alert('> ERROR: ' + (data.error || 'Error deleting user'));
                     }
                 })
-                .catch((error) => console.error('Error deleting user:', error));
+                .catch((error) => console.error('> ERROR deleting user:', error));
         }
 
         function cancelEdit() {
